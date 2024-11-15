@@ -44,10 +44,7 @@ void showStudentScreen(sf::RenderWindow &window, sf::Font &font) {
     window.draw(courseText);
     window.draw(studentDetailsText);
     window.display();
-} 
-bool isButtonClicked(const sf::RectangleShape &button, const sf::Vector2i &mousePos) {
-    return button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-}//copy all of the above to make teacher and admin screens make changes where necesarry
+}
 
 void showTeacherScreen(sf::RenderWindow &window, sf::Font &font) {
     window.clear(sf::Color::White);
@@ -82,9 +79,6 @@ void showTeacherScreen(sf::RenderWindow &window, sf::Font &font) {
     window.draw(createText);
     window.draw(gradeText);
     window.display();
-}
-bool isButtonClicked2(const sf::RectangleShape &button, const sf::Vector2i &mousePos) {
-    return button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
 }
 
 void showAdminScreen(sf::RenderWindow &window, sf::Font &font) {
@@ -121,21 +115,20 @@ void showAdminScreen(sf::RenderWindow &window, sf::Font &font) {
     window.draw(existText);
     window.display();
 }
-bool isButtonClicked3(const sf::RectangleShape &button, const sf::Vector2i &mousePos) {
+bool isButtonClicked(const sf::RectangleShape &button, const sf::Vector2i &mousePos) {
     return button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
 }
 
 int main() {
-    //the main window (mw)
+    // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Sasta LMS");
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
-        cerr << "Error loading font" <<endl;
+        cerr << "Error loading font" << endl;
         return -1;
     }
 
-
-    //mw Title
+    // Main screen title
     sf::Text title("Sasta LMS", font, 50);
     title.setPosition(300, 50);
     title.setFillColor(sf::Color::Blue);
@@ -153,7 +146,7 @@ int main() {
     adminButton.setPosition(500, 150);
     adminButton.setFillColor(sf::Color::Cyan);
 
-    //Button text
+    // Button text
     sf::Text studentText("Student", font, 20);
     studentText.setPosition(175, 160);
     studentText.setFillColor(sf::Color::Black);
@@ -166,20 +159,20 @@ int main() {
     adminText.setPosition(535, 160);
     adminText.setFillColor(sf::Color::Black);
 
-    //login section
+    // Login section
     sf::Text loginText("LOGIN", font, 30);
     loginText.setPosition(350, 250);
     loginText.setFillColor(sf::Color::Black);
 
-    sf::Text usernameText("Username:", font, 20);
-    usernameText.setPosition(200, 320);
-    usernameText.setFillColor(sf::Color::Black);
+    sf::Text usernameLabel("Username:", font, 20);
+    usernameLabel.setPosition(200, 320);
+    usernameLabel.setFillColor(sf::Color::Black);
 
-    sf::Text passwordText("Password:", font, 20);
-    passwordText.setPosition(200, 370);
-    passwordText.setFillColor(sf::Color::Black);
+    sf::Text passwordLabel("Password:", font, 20);
+    passwordLabel.setPosition(200, 370);
+    passwordLabel.setFillColor(sf::Color::Black);
 
-    //Input
+    // Input boxes
     sf::RectangleShape usernameBox(sf::Vector2f(300, 30));
     usernameBox.setPosition(320, 320);
     usernameBox.setFillColor(sf::Color::White);
@@ -188,37 +181,86 @@ int main() {
     passwordBox.setPosition(320, 370);
     passwordBox.setFillColor(sf::Color::White);
 
-    //Variable to track the current screen
+    // Input text variables
+    std::string usernameInput;
+    std::string passwordInput;
+    sf::Text usernameText("", font, 20);
+    sf::Text passwordText("", font, 20);
+
+    usernameText.setFillColor(sf::Color::Black);
+    passwordText.setFillColor(sf::Color::Black);
+
+    bool isUsernameActive = false;
+    bool isPasswordActive = false;
+
     ScreenState currentScreen = MainScreen;
-    //the main thing in mkain
+
+    // Main loop
     while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event)) { // taken from lab 9
-            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) { 
-                cout << "Closed the window"; 
-                window.close(); 
-            } 
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+                window.close();
+            }
 
-            //Check for mouse click
+            // Check for mouse clicks
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
                 if (currentScreen == MainScreen) {
-                    // check for which button is clicked
+                    // Handle button clicks
                     if (isButtonClicked(studentButton, mousePos)) {
-                        currentScreen = StudentScreen; // Switch to student screen
+                        currentScreen = StudentScreen;
+                    } else if (isButtonClicked(teacherButton, mousePos)) {
+                        currentScreen = TeacherScreen;
+                    } else if (isButtonClicked(adminButton, mousePos)) {
+                        currentScreen = AdminScreen;
                     }
-                    else if (isButtonClicked2(teacherButton, mousePos)) {
-                        currentScreen = TeacherScreen; //switch to teacher screen
+
+                    // Check if username or password box is clicked
+                    if (usernameBox.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        isUsernameActive = true;
+                        isPasswordActive = false;
+                    } 
+                    else if (passwordBox.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        isPasswordActive = true;
+                        isUsernameActive = false;
+                    } 
+                    else {
+                        isUsernameActive = false;
+                        isPasswordActive = false;
                     }
-                    else if (isButtonClicked3(adminButton, mousePos)) {
-                        currentScreen = AdminScreen; //switch to admin screen
+                }
+            }
+
+            // Handle text input
+            if (event.type == sf::Event::TextEntered) {
+                if (isUsernameActive) {
+                    if (event.text.unicode == '\b' && !usernameInput.empty()) {
+                        usernameInput.pop_back();
+                    } 
+                    else if (event.text.unicode < 128 && event.text.unicode != '\b') {
+                        usernameInput += static_cast<char>(event.text.unicode);
                     }
+                    usernameText.setString(usernameInput);
+                } 
+                else if (isPasswordActive) {
+                    if (event.text.unicode == '\b' && !passwordInput.empty()) {
+                        passwordInput.pop_back();
+                    }
+                    else if (event.text.unicode < 128 && event.text.unicode != '\b') {
+                        passwordInput += static_cast<char>(event.text.unicode);
+                    }
+                    passwordText.setString(std::string(passwordInput.size(), '*')); // Mask password
                 }
             }
         }
 
-        //rendering appropriate screen
+        // Update positions of the text
+        usernameText.setPosition(325, 325);
+        passwordText.setPosition(325, 375);
+
+        // Render the appropriate screen
         if (currentScreen == MainScreen) {
             window.clear(sf::Color::White);
             window.draw(title);
@@ -229,22 +271,38 @@ int main() {
             window.draw(teacherText);
             window.draw(adminText);
             window.draw(loginText);
-            window.draw(usernameText);
-            window.draw(passwordText);
+            window.draw(usernameLabel);
+            window.draw(passwordLabel);
             window.draw(usernameBox);
             window.draw(passwordBox);
+            window.draw(usernameText);
+            window.draw(passwordText);
             window.display();
         } 
-        else if (currentScreen == StudentScreen) {
-            showStudentScreen(window, font);
+        if (isUsernameActive){
+            usernameBox.setOutlineColor(sf::Color::Blue);
         }
+        else{
+            usernameBox.setOutlineColor(sf::Color::Transparent);
+        usernameBox.setOutlineThickness(2);
+        }
+
+        if (isPasswordActive){
+            passwordBox.setOutlineColor(sf::Color::Blue);
+        }
+        else{
+            passwordBox.setOutlineColor(sf::Color::Transparent);
+        passwordBox.setOutlineThickness(2);
+        }
+        if (currentScreen == StudentScreen) {
+            showStudentScreen(window, font);
+        } 
         else if (currentScreen == TeacherScreen) {
             showTeacherScreen(window, font);
-        }
+        } 
         else if (currentScreen == AdminScreen) {
             showAdminScreen(window, font);
         }
     }
-
     return 0;
 }
