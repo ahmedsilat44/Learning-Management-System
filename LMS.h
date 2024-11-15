@@ -115,34 +115,48 @@ class Student : public User {
 private:
     string studentId;
     float gpa;
-    vector<string> enrolledCourses;
-    string category;
+    vector<Course> enrolledCourses;
+    enum Category {YohsinStudent, HighScholarshipStudent, LowScholarshipStudent, NoScholarshipStudent};
 public:
 
     void viewDashboard();
     void checkGPARequirement();
+    float getGPA();
 };
 
 class Teacher : public User {
 private:
     string teacherId;
-    vector<string> assignedCourses;
+    vector<Course> assignedCourses;
 public:
-
-    void createCourse();
+    void viewDashboard();
     void gradeAssignment();
+    void createAssignment();
     void postAnnouncement();
 };
 
 class Admin : public User {
     private:
     string adminId;
-    string permissions;
-public:
 
+public:
+    void viewDashboard();
     void createUser();
-    void manageCourses();
-    void generateReports();
+    void createCourse();
+    void createSection();
+};
+
+class Grade {
+    private:
+    string studentId;
+    string courseId;
+    float grade;
+public:
+        Grade();
+        void addGrade();
+        void viewGrade();
+        void updateGrade();
+    
 };
 
 class Course {
@@ -150,15 +164,15 @@ class Course {
     string courseId;
     string courseName;
     string description;
-    string assignedTeacher;
-    vector<string> students;
-    vector<string> Assignment;
+    Teacher assignedTeacher;
+    vector<Grade> grades;
+    vector<Student> students;
+    vector<Assignment> Assignment;
 public:
-
+    Course
     void addStudent();
     void removeStudent();
-    void addContent();
-    void postAnnouncement();
+    void addAssignment();
 };
 
 class Assignment {
