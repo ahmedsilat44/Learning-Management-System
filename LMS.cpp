@@ -14,6 +14,18 @@ User::User(string userId, string username, string password, string email, string
     this->role = role;
 }
 
+Student::Student(string userId, string username, string password, string email, string role, string studentId) : User(userId, username, password, email, role) {
+    this->studentId = studentId;
+}
+
+Teacher::Teacher(string userId, string username, string password, string email, string role, string teacherId) : User(userId, username, password, email, role) {
+    this->teacherId = teacherId;
+}
+
+Admin::Admin(string userId, string username, string password, string email, string role, string adminId) : User(userId, username, password, email, role) {
+    this->adminId = adminId;
+}
+
 string User::getUsername() {
     return username;
 }
@@ -48,40 +60,69 @@ void Student::viewDashboard() {
     // Send to Dashboard page
 }
 
-void Studdent::getGPA() {
+float Student::getGPA() {
+    float totalGrade = 0;
     for (int i = 0; i < grades.size(); ++i) {
         if (grades[i].studentId == studentId) {
-            return grades[i].grade;
+            totalGrade =  grades[i].grade;
+        }
+    }
+    float gradePercentage = totalGrade / grade.size();
+   return gradePercentage;
+}
+
+void Student::checkGPARequirement() {
+    float gradePercentage = getGPA();
+     if (this->Category == "Yohsin") {
+        if (gradePercentage >= 87.5) {
+            cout << "Good Grade Standing" << endl;
+        } else {
+            cout << "Academic Warning" << endl;
+        }
+    } else if (this->Category == "High") {
+        if (gradePercentage >= 75) {
+            cout << "Good Grade Standing" << endl;
+        } else {
+            cout << "Academic Warning" << endl;
+        }
+    } else{
+        if (gradePercentage >= 67.5) {
+            cout << "Good Grade Standing" << endl;
+        } else {
+            cout << "Academic Warning" << endl;
         }
     }
 }
 
-void Student::checkGPARequirement() {
-    float grade;
-
-    // Implementation of checkGPARequirement method
-}
-
 // Teacher class methods
-void Teacher::createCourse() {
-    // Implementation of createCourse method
+void Teacher::createAssignment(string courseID) {
+    for (int i = 0; i < courses.size(); ++i) {
+        if (courses[i].courseId == courseID) {
+            courses[i].addAssignment();
+        }
+    }
+
 }
 
 void Teacher::viewDashboard() {
     // Send to Dashboard page
 }
 
-void Teacher::gradeAssignment() {
-    // Implementation of gradeAssignment method
+void Teacher::gradeAssignment(string assignmentId, string studentId) {
+    for (int i = 0; i < assignments.size(); ++i) {
+        if (assignments[i].assignmentId == assignmentId) {
+            assignments[i].gradeSubmission();
+        }
+    }
 }
 
-void Teacher::postAnnouncement() {
-    // Implementation of postAnnouncement method
-}
+
 
 // Admin class methods
-void Admin::createUser() {
-    // Implementation of createUser method
+void Admin::createUser(string userId, string username, string password, string email, string role, vector<User> users) {
+    User user = User(userId, username, password, email, role);
+    users.push_back(user);
+
 }
 
 void Admin::viewDashboard() {
@@ -90,46 +131,36 @@ void Admin::viewDashboard() {
 
 
 void Admin::manageCourses() {
-    // Implementation of manageCourses method
 }
 
 void Admin::generateReports() {
-    // Implementation of generateReports method
 }
 
 // Course class methods
 void Course::addStudent() {
-    // Implementation of addStudent method
 }
 
 void Course::removeStudent() {
-    // Implementation of removeStudent method
 }
 
-void Course::addContent() {
-    // Implementation of addContent method
+void Course::addAssignment() {
 }
 
 void Course::postAnnouncement() {
-    // Implementation of postAnnouncement method
 }
 
 // Assignment class methods
 void Assignment::submitAssignment() {
-    // Implementation of submitAssignment method
 }
 
 void Assignment::gradeSubmission() {
-    // Implementation of gradeSubmission method
 }
 
 // Submission class methods
 void Submission::submit() {
-    // Implementation of submit method
 }
 
 void Submission::viewFeedback() {
-    // Implementation of viewFeedback method
 }
 
 vector<User> users;
@@ -139,14 +170,14 @@ int main() {
     // Create instances of User, Student, Teacher, Admin, Course, Assignment, and Submission classes
     vector<User> users;
     for (int i = 1; i <= 15; ++i) {
-        users.push_back(User("student" + to_string(i), "pass" + to_string(i), "Student" + to_string(i), "student" + to_string(i) + "@example.com", "student"));
+        users.push_back(Student("student" + to_string(i), "pass" + to_string(i), "Student" + to_string(i), "student" + to_string(i) + "@example.com", "student"));
     }
 
     for (int i = 1; i <= 5; ++i) {
-        users.push_back(User("teacher" + to_string(i), "pass" + to_string(i), "Teacher" + to_string(i), "teacher" + to_string(i) + "@example.com", "teacher"));
+        users.push_back(Teacher("teacher" + to_string(i), "pass" + to_string(i), "Teacher" + to_string(i), "teacher" + to_string(i) + "@example.com", "teacher"));
     }
 
-    users.push_back(User("admin1", "pass1", "Admin1", "admin1@example.com", "admin"));
+    users.push_back(Admin("admin1", "pass1", "Admin1", "admin1@example.com", "admin"));
 
 
     for (int i = 0; i < users.size(); ++i) {
