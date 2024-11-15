@@ -79,7 +79,7 @@
 // Attributes: submissionId, assignmentId, studentId, file, submissionDate, grade
 // Methods: submit(), viewFeedback()
 
-#ifdef LMS_H // If the LMS_H macro is not defined, the code will be included in the compilation process
+
 #define LMS_H
 
 #include <iostream>
@@ -102,9 +102,13 @@ class User {
     string role;
 public:
 
-    void login();
+    User(string userId, string username, string password, string email, string role);
+
+    void login(string username, string password);
     void logout();
     void viewProfile();
+    void getRole();
+    string getUsername();
 };
 
 class Student : public User {
@@ -183,5 +187,5 @@ public:
         void viewFeedback();
     };
 
-#endif
+
 
